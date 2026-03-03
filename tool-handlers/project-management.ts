@@ -119,7 +119,7 @@ export const handleProjectManagementTools = async (request: any) => {
 
     case "create_work_item": {
       const args = types.CreateWorkItemSchema.parse(request.params.arguments);
-      const workItemInfo = await workitem.createWorkItemFunc(args.organizationId, args.assignedTo, args.spaceId, args.subject, args.workitemTypeId, args.customFieldValues, args.description, args.labels, args.parentId, args.participants, args.sprint, args.trackers, args.verifier, args.versions);
+      const workItemInfo = await workitem.createWorkItemFunc(args.organizationId, args.assignedTo, args.spaceId, args.subject, args.workitemTypeId, args.customFieldValues, args.description, args.formatType, args.labels, args.parentId, args.participants, args.sprint, args.trackers, args.verifier, args.versions);
       return {
         content: [{ type: "text", text: JSON.stringify(workItemInfo, null, 2) }],
       };

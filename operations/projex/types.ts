@@ -276,6 +276,7 @@ export const CreateWorkItemSchema = z.object({
   assignedTo: z.string().describe("Assignee user ID"),
   customFieldValues: z.record(z.string()).optional().describe("Custom field values"),
   description: z.string().optional().describe("Work item description"),
+  formatType: z.enum(["MARKDOWN", "RICHTEXT"]).optional().default("MARKDOWN").describe("Description format: MARKDOWN for markdown format, RICHTEXT for rich text format. Default is MARKDOWN"),
   labels: z.array(z.string()).optional().describe("Associated label IDs"),
   parentId: z.string().optional().describe("Parent work item ID"),
   participants: z.array(z.string()).optional().describe("Participant user IDs"),

@@ -537,6 +537,7 @@ export async function createWorkItemFunc(
     workitemTypeId: string,
     customFieldValues?: RecordType<string, string> | undefined,
     description?: string | undefined,
+    formatType?: "MARKDOWN" | "RICHTEXT" | undefined,
     labels?: string[],
     parentId?: string | undefined,
     participants?: string[] | undefined,
@@ -561,6 +562,9 @@ export async function createWorkItemFunc(
   if (description !== undefined) {
     payload.description = description;
   }
+
+  // Always set formatType, default to MARKDOWN if not specified
+  payload.formatType = formatType ?? "MARKDOWN";
 
   if (labels && labels.length > 0) {
     payload.labels = labels;
