@@ -286,6 +286,18 @@ export const handleProjectManagementTools = async (request: any) => {
       };
     }
 
+    case "get_work_item_file": {
+      const args = types.GetWorkItemFileSchema.parse(request.params.arguments);
+      const fileInfo = await workitem.getWorkItemFileFunc(
+        args.organizationId,
+        args.workItemId,
+        args.fileId
+      );
+      return {
+        content: [{ type: "text", text: JSON.stringify(fileInfo, null, 2) }],
+      };
+    }
+
     default:
       return null;
   }

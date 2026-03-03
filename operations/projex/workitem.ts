@@ -920,3 +920,24 @@ export async function createWorkItemCommentFunc(
   // 否则直接返回响应
   return response;
 }
+
+/**
+ * 获取工作项文件（附件）信息
+ * @param organizationId 企业 ID
+ * @param workItemId 工作项 ID
+ * @param fileId 文件 ID
+ * @returns 文件信息，包含临时下载地址
+ */
+export async function getWorkItemFileFunc(
+  organizationId: string,
+  workItemId: string,
+  fileId: string
+): Promise<any> {
+  const url = `/oapi/v1/projex/organizations/${organizationId}/workitems/${workItemId}/files/${fileId}`;
+
+  const response = await yunxiaoRequest(url, {
+    method: "GET",
+  });
+
+  return response;
+}

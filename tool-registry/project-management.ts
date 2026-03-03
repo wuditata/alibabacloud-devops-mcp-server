@@ -108,5 +108,10 @@ export const getProjectManagementTools = () => [
     name: "create_work_item_comment",
     description: "[Project Management] Create a comment for a specific work item",
     inputSchema: zodToJsonSchema(types.CreateWorkItemCommentSchema),
+  },
+  {
+    name: "get_work_item_file",
+    description: "[Project Management] Get work item file (attachment) information, including temporary download URL. Use this tool when you need to download images or other files attached to work items.",
+    inputSchema: zodToJsonSchema(types.GetWorkItemFileSchema),
   }
 ];

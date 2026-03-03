@@ -78,19 +78,20 @@ export {
   // Project schemas
   GetProjectSchema,
   SearchProjectsSchema,
-  
+
   // Sprint schemas
   GetSprintSchema,
   ListSprintsSchema,
   CreateSprintSchema,
   UpdateSprintSchema,
-  
+
   // Work item schemas
   GetWorkItemSchema,
   CreateWorkItemSchema,
   SearchWorkitemsSchema,
   UpdateWorkItemSchema,
-  
+  GetWorkItemFileSchema,
+
   // Work item type schemas
   ListAllWorkItemTypesSchema,
   ListWorkItemTypesSchema,
@@ -98,11 +99,11 @@ export {
   ListWorkItemRelationWorkItemTypesSchema,
   GetWorkItemTypeFieldConfigSchema,
   GetWorkItemWorkflowSchema,
-  
+
   // Work item comment schemas
   ListWorkItemCommentsSchema,
   CreateWorkItemCommentSchema,
-  
+
   // Effort schemas
   ListCurrentUserEffortRecordsSchema,
   ListEffortRecordsSchema,

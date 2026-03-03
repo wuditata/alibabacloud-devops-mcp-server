@@ -571,6 +571,21 @@ export const UpdateEstimatedEffortSchema = z.object({
   workType: z.string().optional().describe("工作类别"),
 });
 
+// Work item file (attachment) related schemas
+export const GetWorkItemFileSchema = z.object({
+  organizationId: z.string().describe("Organization ID, can be found in the basic information page of the organization admin console"),
+  workItemId: z.string().describe("Work item unique identifier"),
+  fileId: z.string().describe("File unique identifier (file ID from work item attachments)")
+});
+
+export const WorkItemFileInfoSchema = z.object({
+  id: z.string().describe("File ID"),
+  name: z.string().describe("File name"),
+  size: z.number().int().describe("File size in bytes"),
+  suffix: z.string().describe("File extension"),
+  url: z.string().describe("Temporary download URL (has expiration time)"),
+});
+
 // Type exports
 export type WorkItemTypeDetail = z.infer<typeof WorkItemTypeDetailSchema>;
 export type ListAllWorkItemTypesParams = z.infer<typeof ListAllWorkItemTypesSchema>;
@@ -608,3 +623,7 @@ export type ListEstimatedEffortsParams = z.infer<typeof ListEstimatedEffortsSche
 export type CreateEstimatedEffortParams = z.infer<typeof CreateEstimatedEffortSchema>;
 export type UpdateEffortRecordParams = z.infer<typeof UpdateEffortRecordSchema>;
 export type UpdateEstimatedEffortParams = z.infer<typeof UpdateEstimatedEffortSchema>;
+
+// Work item file (attachment) related types
+export type GetWorkItemFileParams = z.infer<typeof GetWorkItemFileSchema>;
+export type WorkItemFileInfo = z.infer<typeof WorkItemFileInfoSchema>;
