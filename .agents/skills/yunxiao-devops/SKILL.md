@@ -34,14 +34,15 @@ description: 阿里云云效 DevOps MCP Server 使用指南，含命令速查、
 
 ### 使用流程
 
-```
-1. 优先读取当前项目根目录下的 .yunxiao.json
-2. 若配置文件存在且字段完整 → 直接使用其中的 organizationId、spaceId、workitemTypeId 等
-3. 若配置中有 token 字段 → 每次调用 yunxiao_execute 时必须通过 token 参数传入
-4. 若不存在或字段缺失 → 调用 API 查询并提示用户补充配置
-```
+> [!CAUTION]
+> **每次调用 `yunxiao_execute` 必须传入 `token` 参数！** MCP Server 无法自动读取 `.yunxiao.json`，必须由 AI 读取 token 后显式传入。
 
-> **重要**：MCP Server 是单进程，无法感知当前工作区目录。`.yunxiao.json` 中的 `token` 不会被 MCP Server 自动读取，**必须由 AI 读取后通过 `yunxiao_execute` 的 `token` 参数传入**。
+```
+1. 读取当前项目根目录下的 .yunxiao.json，获取 token 和其他配置
+2. 每次调用 yunxiao_execute 时，将 token 作为参数传入
+3. 使用配置中的 organizationId、spaceId、workitemTypeId 等作为 params
+4. 若配置不存在或字段缺失 → 调用 API 查询并提示用户补充配置
+```
 
 ### 初始化配置（首次使用）
 
@@ -87,7 +88,7 @@ node dist/index.js --sse --toolsets=lite
 ```json
 {
   "action": "search_workitems",
-  "token": "pat-xxx（可选，不传则用默认 token）",
+  "token": "从 .yunxiao.json 读取的 token（必传）",
   "params": {
     "organizationId": "org-xxx",
     "category": "Req",
@@ -96,8 +97,8 @@ node dist/index.js --sse --toolsets=lite
 }
 ```
 
-- `action`：对应原始工具名（如 `search_workitems`、`create_work_item`、`compare` 等），参见下方命令速查表
-- `token`：可选，传入时临时切换身份，支持多组织场景
+- `action`：对应原始工具名，参见下方命令速查表
+- **`token`：从 `.yunxiao.json` 读取后传入，每次调用都必须带上**
 - `params`：原始工具的参数，格式与直接调用时一致
 
 #### 多组织配置
