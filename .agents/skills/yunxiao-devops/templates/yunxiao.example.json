@@ -1,0 +1,20 @@
+{
+    "organizationId": "",
+    "organizationName": "",
+    "projects": [
+        {
+            "spaceId": "",
+            "name": "",
+            "workitemTypes": {
+                "Req": "",
+                "Task": "",
+                "Bug": ""
+            }
+        }
+    ],
+    "defaultAssignee": "",
+    "modules": [
+        "SEP",
+        "Apollo"
+    ]
+}
