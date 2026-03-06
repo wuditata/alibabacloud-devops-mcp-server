@@ -8,7 +8,7 @@ description: Git 提交时携带云效任务编号
 
 ```
 确定当前开发关联的云效任务：
-  方式一：用户直接提供任务编号（如 GAGA-183）
+  方式一：用户直接提供任务编号（如 TASK-183）
   方式二：读取 .yunxiao.json 后调用 search_workitems 搜索：
     - assignedTo: "self"
     - status: "142838"（开发中）
@@ -33,9 +33,9 @@ type 选项：
   chore    - 构建/工具
 
 示例：
-  feat(training): 新增班级分组 CRUD 接口 [GAGA-185]
-  fix(rental): 修复搜索地址+业主姓名无结果 [GAGA-183]
-  refactor(training): 优化课时消耗逻辑 [GAGA-190]
+  feat(training): 新增班级分组 CRUD 接口 [TASK-185]
+  fix(rental): 修复搜索地址+业主姓名无结果 [TASK-183]
+  refactor(training): 优化课时消耗逻辑 [TASK-190]
 ```
 
 ## Step 3: 执行提交

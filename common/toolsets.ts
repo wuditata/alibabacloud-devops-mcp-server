@@ -7,7 +7,8 @@ export enum Toolset {
   PIPELINE_MANAGEMENT = "pipeline-management",
   PACKAGES_MANAGEMENT = "packages-management",
   APPLICATION_DELIVERY = "application-delivery",
-  TEST_MANAGEMENT = "test-management"
+  TEST_MANAGEMENT = "test-management",
+  LITE = "lite"
 }
 
 // 定义工具接口（与MCP SDK中的Tool接口兼容，但更宽松以适应zodToJsonSchema的输出）

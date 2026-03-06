@@ -31,7 +31,7 @@ import {
     YunxiaoValidationError
 } from "./common/errors.js";
 import { VERSION } from "./common/version.js";
-import {config} from "dotenv";
+import { config } from "dotenv";
 import * as types from "./common/types.js";
 import { getAllTools, getEnabledTools } from "./tool-registry/index.js";
 import { handleToolRequest, handleEnabledToolRequest } from "./tool-handlers/index.js";
@@ -56,11 +56,11 @@ function formatYunxiaoError(error: YunxiaoError): string {
     if (error.method || error.url) {
         message += `\n Request: ${error.method || 'GET'} ${error.url || 'unknown'}`;
     }
-    
+
     if (error.requestHeaders) {
         message += `\n Request Headers: ${JSON.stringify(error.requestHeaders, null, 2)}`;
     }
-    
+
     if (error.requestBody) {
         message += `\n Request Body: ${JSON.stringify(error.requestBody, null, 2)}`;
     }
@@ -91,13 +91,13 @@ function formatYunxiaoError(error: YunxiaoError): string {
             if (response.data && typeof response.data === 'object') {
                 message += `\n data: ${JSON.stringify(response.data, null, 2)}`;
             }
-            
+
             // 如果响应体中有更多详细信息，也一并显示
             if (Object.keys(response).length > 0) {
                 message += `\n Full Response: ${JSON.stringify(response, null, 2)}`;
             }
         }
-        
+
         // 根据状态码提供通用建议
         switch (error.status) {
             case 400:
@@ -119,21 +119,24 @@ function formatYunxiaoError(error: YunxiaoError): string {
 
 server.setRequestHandler(ListToolsRequestSchema, async () => {
     let tools: any[];
-    
+
     if (enabledToolsets.length > 0) {
-        // 获取基础工具（总是加载）
-        const baseTools = getEnabledTools([Toolset.BASE]);
-        
         // 获取启用的工具集工具
         const enabledTools = getEnabledTools(enabledToolsets);
-        
-        // 合并基础工具和启用的工具集工具
-        tools = [...baseTools, ...enabledTools];
+
+        // lite 模式下不额外注册 base 工具，全部通过 yunxiao_execute 统一入口
+        const isLite = enabledToolsets.includes(Toolset.LITE);
+        if (isLite) {
+            tools = enabledTools;
+        } else {
+            const baseTools = getEnabledTools([Toolset.BASE]);
+            tools = [...baseTools, ...enabledTools];
+        }
     } else {
         // 如果没有指定启用的工具集，则获取所有工具（已包含基础工具）
         tools = getAllTools();
     }
-    
+
     return {
         tools,
     };
@@ -146,10 +149,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
 
         // Delegate to our modular tool handler with toolset support
-        const result = enabledToolsets.length > 0 
+        const result = enabledToolsets.length > 0
             ? await handleEnabledToolRequest(request, enabledToolsets)
             : await handleToolRequest(request);
-            
+
         return result;
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -166,22 +169,22 @@ config();
 
 // 解析启用的工具集
 const parseEnabledToolsets = (input: string | undefined): Toolset[] => {
-  if (!input) return [];
-  
-  return input.split(',').map(toolset => {
-    const trimmed = toolset.trim() as Toolset;
-    // 验证工具集名称是否有效
-    if (!Object.values(Toolset).includes(trimmed)) {
-      throw new Error(`Unknown toolset: ${trimmed}`);
-    }
-    return trimmed;
-  });
+    if (!input) return [];
+
+    return input.split(',').map(toolset => {
+        const trimmed = toolset.trim() as Toolset;
+        // 验证工具集名称是否有效
+        if (!Object.values(Toolset).includes(trimmed)) {
+            throw new Error(`Unknown toolset: ${trimmed}`);
+        }
+        return trimmed;
+    });
 };
 
 // 获取启用的工具集（从命令行参数或环境变量）
 const enabledToolsets = parseEnabledToolsets(
-  process.argv.find(arg => arg.startsWith('--toolsets='))?.split('=')[1] || 
-  process.env.DEVOPS_TOOLSETS
+    process.argv.find(arg => arg.startsWith('--toolsets='))?.split('=')[1] ||
+    process.env.DEVOPS_TOOLSETS
 );
 
 // Check if we should run in SSE mode
@@ -193,26 +196,26 @@ async function runServer() {
         const { default: express } = await import('express');
         const app: any = express();
         const port = process.env.PORT || 3000;
-        
+
         // Store sessions with their tokens
         const sessions: Record<string, { transport: SSEServerTransport; server: Server; yunxiao_access_token?: string }> = {};
-        
+
         // SSE endpoint - handles initial connection
         app.get('/sse', async (req: any, res: any) => {
             // In SSE mode, we can use console.log for debugging since it doesn't interfere with the protocol
             console.log(`New SSE connection from ${req.ip}`);
-            
+
             // Get token from query parameters or headers
             const yunxiao_access_token = req.query.yunxiao_access_token || req.headers['x-yunxiao-token'] || process.env.YUNXIAO_ACCESS_TOKEN;
-            
+
             // Create transport with endpoint for POST messages
             const sseTransport = new SSEServerTransport('/messages', res);
             const sessionId = sseTransport.sessionId;
-            
+
             if (sessionId) {
                 sessions[sessionId] = { transport: sseTransport, server, yunxiao_access_token };
             }
-            
+
             try {
                 await server.connect(sseTransport);
                 // In SSE mode, console.error is acceptable for status messages
@@ -227,37 +230,37 @@ async function runServer() {
                 res.status(500).send("Server error");
             }
         });
-        
+
         // POST endpoint - handles incoming messages
         app.use(express.json({ limit: '10mb' })); // Add JSON body parser
         app.post('/messages', async (req: any, res: any) => {
             const sessionId = req.query.sessionId as string;
             const session = sessions[sessionId];
-            
+
             if (!session) {
                 res.status(404).send("Session not found");
                 return;
             }
-            
+
             try {
                 // Set the session token before handling the message
                 const utils = await import('./common/utils.js');
                 utils.setCurrentSessionToken(session.yunxiao_access_token);
-                
+
                 await session.transport.handlePostMessage(req, res, req.body);
             } catch (error) {
                 console.error("Error handling POST message:", error);
                 res.status(500).send("Server error");
             }
         });
-        
+
         // Start server
         const serverInstance: any = app.listen(port, () => {
             console.log(`Yunxiao MCP Server running in SSE mode on port ${port}`);
             console.log(`Connect via SSE at http://localhost:${port}/sse`);
             console.log(`Send messages to http://localhost:${port}/messages?sessionId=<session-id>`);
         });
-        
+
         // Handle graceful shutdown
         process.on('SIGINT', () => {
             console.log('Shutting down SSE server...');

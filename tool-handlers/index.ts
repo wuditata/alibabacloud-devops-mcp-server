@@ -20,6 +20,7 @@ import { handleVMDeployOrderTools } from './vmDeployOrder.js';
 import { handleCommitTools } from './commit.js';
 import { handleBaseTools } from './base.js';
 import { handleTestManagementTools } from './test-management.js';
+import { handleLiteTools } from './lite.js';
 import { Toolset } from '../common/toolsets.js';
 
 // 定义处理函数映射
@@ -30,8 +31,9 @@ const HANDLER_MAP: Record<Toolset, (request: any) => Promise<any>> = {
   [Toolset.PROJECT_MANAGEMENT]: handleProjectManagementTools,
   [Toolset.PIPELINE_MANAGEMENT]: handlePipelineTools,
   [Toolset.PACKAGES_MANAGEMENT]: handlePackageManagementTools,
-  [Toolset.APPLICATION_DELIVERY]: handleAppStackTools, // 注意：这里只使用了主处理函数，其他AppStack处理函数在内部处理
+  [Toolset.APPLICATION_DELIVERY]: handleAppStackTools,
   [Toolset.TEST_MANAGEMENT]: handleTestManagementTools,
+  [Toolset.LITE]: handleLiteTools,
 }
 
 // 保持向后兼容的接口
@@ -84,30 +86,32 @@ export const handleToolRequestByToolset = async (request: any, toolsetName: Tool
 
 // 新增处理启用工具集的接口
 export const handleEnabledToolRequest = async (request: any, enabledToolsets: Toolset[]) => {
-  // 总是先尝试处理基础工具集
-  try {
-    const baseResult = await handleToolRequestByToolset(request, Toolset.BASE);
-    if (baseResult !== null) {
-      return baseResult;
-    }
-  } catch (error) {
-    // 如果工具不在基础工具集中，继续尝试其他工具集
-    // 如果是其他错误，重新抛出
-    if (!(error instanceof Error && error.message.includes("Unknown tool"))) {
-      throw error;
+  const isLite = enabledToolsets.includes(Toolset.LITE);
+
+  // lite 模式下 base action 通过 yunxiao_execute → handleToolRequest 路由，无需前置调用
+  if (!isLite) {
+    try {
+      const baseResult = await handleToolRequestByToolset(request, Toolset.BASE);
+      if (baseResult !== null) {
+        return baseResult;
+      }
+    } catch (error) {
+      if (!(error instanceof Error && error.message.includes("Unknown tool"))) {
+        throw error;
+      }
     }
   }
-  
+
   // 如果没有指定启用的工具集，则处理所有工具集（除了基础工具集，因为已经处理过了）
   const toolsets = enabledToolsets.length > 0 ? enabledToolsets : Object.values(Toolset).filter(t => t !== Toolset.BASE);
-  
+
   // 按顺序尝试每个启用的工具集
   for (const toolset of toolsets) {
     // 跳过基础工具集，因为我们已经处理过了
     if (toolset === Toolset.BASE) {
       continue;
     }
-    
+
     try {
       const result = await handleToolRequestByToolset(request, toolset);
       if (result !== null) {

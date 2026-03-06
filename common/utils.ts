@@ -126,7 +126,7 @@ export async function yunxiaoRequest(
   debug(`Body:`, options.body);
 
   const response = await fetch(url, {
-    method : options.method || "GET",
+    method: options.method || "GET",
     headers: requestHeaders,
     body: options.body ? JSON.stringify(options.body) : undefined,
   } as RequestInit);
@@ -137,7 +137,7 @@ export async function yunxiaoRequest(
 
   if (!response.ok) {
     throw createYunxiaoError(
-      response.status, 
+      response.status,
       responseBody,
       url,
       options.method || "GET",
@@ -292,14 +292,14 @@ export function getEndOfDayTimestamp(date: Date | string): number {
 export function getStartOfWeekTimestamp(startOnMonday: boolean = true): number {
   const now = new Date();
   const dayOfWeek = now.getDay(); // 0 is Sunday, 1 is Monday, etc.
-  const diff = startOnMonday ? 
+  const diff = startOnMonday ?
     (dayOfWeek === 0 ? 6 : dayOfWeek - 1) : // If startOnMonday, set Sunday as day 7
     dayOfWeek;
-  
+
   // Set to beginning of the week
   now.setDate(now.getDate() - diff);
   now.setHours(0, 0, 0, 0);
-  
+
   return now.getTime();
 }
 
@@ -314,11 +314,11 @@ export function getEndOfWeekTimestamp(startOnMonday: boolean = true): number {
   const diff = startOnMonday ?
     (dayOfWeek === 0 ? 0 : 7 - dayOfWeek) : // If startOnMonday, set Sunday as day 7
     (6 - dayOfWeek);
-  
+
   // Set to end of the week
   now.setDate(now.getDate() + diff);
   now.setHours(23, 59, 59, 999);
-  
+
   return now.getTime();
 }
 
@@ -360,7 +360,7 @@ export function parseDateReference(dateReference?: string): { startTime: number,
   }
 
   const normalizedRef = dateReference.trim().toLowerCase();
-  
+
   // Today/yesterday
   if (normalizedRef === 'today' || normalizedRef === '今天') {
     return {
@@ -368,7 +368,7 @@ export function parseDateReference(dateReference?: string): { startTime: number,
       endTime: getEndOfTodayTimestamp()
     };
   }
-  
+
   if (normalizedRef === 'yesterday' || normalizedRef === '昨天') {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -377,59 +377,59 @@ export function parseDateReference(dateReference?: string): { startTime: number,
       endTime: getEndOfDayTimestamp(yesterday)
     };
   }
-  
+
   // This week/last week
-  if (normalizedRef === 'this week' || normalizedRef === '本周' || 
-      normalizedRef === 'current week' || normalizedRef === '这周' || 
-      normalizedRef === '这个星期') {
+  if (normalizedRef === 'this week' || normalizedRef === '本周' ||
+    normalizedRef === 'current week' || normalizedRef === '这周' ||
+    normalizedRef === '这个星期') {
     return {
       startTime: getStartOfWeekTimestamp(),
       endTime: getEndOfWeekTimestamp()
     };
   }
-  
-  if (normalizedRef === 'last week' || normalizedRef === '上周' || 
-      normalizedRef === '上個星期' || normalizedRef === '上个星期') {
+
+  if (normalizedRef === 'last week' || normalizedRef === '上周' ||
+    normalizedRef === '上個星期' || normalizedRef === '上个星期') {
     const lastWeekStart = new Date(getStartOfWeekTimestamp());
     lastWeekStart.setDate(lastWeekStart.getDate() - 7);
-    
+
     const lastWeekEnd = new Date(getEndOfWeekTimestamp());
     lastWeekEnd.setDate(lastWeekEnd.getDate() - 7);
-    
+
     return {
       startTime: lastWeekStart.getTime(),
       endTime: lastWeekEnd.getTime()
     };
   }
-  
+
   // This month/last month
-  if (normalizedRef === 'this month' || normalizedRef === '本月' || 
-      normalizedRef === 'current month' || normalizedRef === '这个月') {
+  if (normalizedRef === 'this month' || normalizedRef === '本月' ||
+    normalizedRef === 'current month' || normalizedRef === '这个月') {
     return {
       startTime: getStartOfMonthTimestamp(),
       endTime: getEndOfMonthTimestamp()
     };
   }
-  
-  if (normalizedRef === 'last month' || normalizedRef === '上月' || 
-      normalizedRef === '上个月') {
+
+  if (normalizedRef === 'last month' || normalizedRef === '上月' ||
+    normalizedRef === '上个月') {
     const now = new Date();
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
-    
+
     // Start of last month
     const startOfLastMonth = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1);
     startOfLastMonth.setHours(0, 0, 0, 0);
-    
+
     // End of last month
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
     endOfLastMonth.setHours(23, 59, 59, 999);
-    
+
     return {
       startTime: startOfLastMonth.getTime(),
       endTime: endOfLastMonth.getTime()
     };
   }
-  
+
   // Default to all time
   return {
     startTime: 0,

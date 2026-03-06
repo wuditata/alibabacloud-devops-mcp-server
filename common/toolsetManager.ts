@@ -24,6 +24,7 @@ import { getVMDeployOrderTools } from '../tool-registry/vmDeployOrder.js';
 import { getCommitTools } from '../tool-registry/commit.js';
 import { getBaseTools } from '../tool-registry/base.js';
 import { getTestManagementTools } from '../tool-registry/test-management.js';
+import { getLiteTools } from '../tool-registry/lite.js';
 
 // 定义所有工具集配置
 const ALL_TOOLSET_CONFIGS: Record<Toolset, ToolsetConfig> = {
@@ -46,7 +47,7 @@ const ALL_TOOLSET_CONFIGS: Record<Toolset, ToolsetConfig> = {
     tools: (() => {
       const allOrgTools = getOrganizationTools();
       // 移除基础工具集中的三个常用工具
-      const filteredOrgTools = allOrgTools.filter(tool => 
+      const filteredOrgTools = allOrgTools.filter(tool =>
         tool.name !== "get_current_organization_info" &&
         tool.name !== "get_user_organizations" &&
         tool.name !== "get_current_user"
@@ -97,6 +98,11 @@ const ALL_TOOLSET_CONFIGS: Record<Toolset, ToolsetConfig> = {
     name: Toolset.TEST_MANAGEMENT,
     description: "Test management tools",
     tools: getTestManagementTools as () => Tool[]
+  },
+  [Toolset.LITE]: {
+    name: Toolset.LITE,
+    description: "Lite mode - single unified tool for all operations",
+    tools: getLiteTools as () => Tool[]
   }
 };
 
@@ -117,7 +123,7 @@ export class DefaultToolsetManager implements ToolsetManager {
   getEnabledTools(enabledToolsets: Toolset[]): Tool[] {
     // 如果没有指定启用的工具集，则使用默认配置
     const toolsets = enabledToolsets.length > 0 ? enabledToolsets : DEFAULT_ENABLED_TOOLSETS;
-    
+
     return toolsets.flatMap(toolsetName => {
       const config = ALL_TOOLSET_CONFIGS[toolsetName];
       if (!config) {
