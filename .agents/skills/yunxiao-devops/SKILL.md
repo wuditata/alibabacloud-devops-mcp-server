@@ -13,22 +13,27 @@ description: 阿里云云效 DevOps MCP Server 使用指南，含命令速查、
 
 ```json
 {
-  "token": "your-yunxiao-access-token",
-  "organizationId": "org-xxx",
-  "organizationName": "我的组织",
-  "projects": [
-    {
-      "spaceId": "project-xxx",
-      "name": "项目",
-      "workitemTypes": {
-        "Req": "type-id-for-req",
-        "Task": "type-id-for-task",
-        "Bug": "type-id-for-bug"
-      }
-    }
-  ],
-  "defaultAssignee": "user-xxx",
-  "modules": ["SEP", "Apollo", "AI"]
+    "organizations": [
+        {
+            "token": "your-yunxiao-access-token",
+            "organizationId": "org-xxx",
+            "organizationName": "我的组织",
+            "default": true,
+            "defaultAssignee": "user-xxx",
+            "projects": [
+                {
+                    "spaceId": "project-xxx",
+                    "name": "项目",
+                    "workitemTypes": {
+                        "Req": "type-id-for-req",
+                        "Task": "type-id-for-task",
+                        "Bug": "type-id-for-bug"
+                    }
+                }
+            ],
+            "modules": ["SEP", "Apollo", "AI"]
+        }
+    ]
 }
 ```
 
@@ -38,7 +43,7 @@ description: 阿里云云效 DevOps MCP Server 使用指南，含命令速查、
 > **每次调用 `yunxiao_execute` 必须传入 `token` 参数！** MCP Server 无法自动读取 `.yunxiao.json`，必须由 AI 读取 token 后显式传入。
 
 ```
-1. 读取当前项目根目录下的 .yunxiao.json，获取 token 和其他配置
+1. 读取当前项目根目录下的 .yunxiao.json，定位目标组织（default 或用户指定），获取 token 和配置
 2. 每次调用 yunxiao_execute 时，将 token 作为参数传入
 3. 使用配置中的 organizationId、spaceId、workitemTypeId 等作为 params
 4. 若配置不存在或字段缺失 → 调用 API 查询并提示用户补充配置
@@ -51,10 +56,10 @@ description: 阿里云云效 DevOps MCP Server 使用指南，含命令速查、
 2. 调用 search_projects → 获取关注项目的 spaceId
 3. 调用 list_work_item_types → 获取该项目的 Req/Task/Bug typeId
 4. 调用 get_current_organization_Info → 获取当前用户 userId
-5. 将以上信息写入项目根目录的 .yunxiao.json
+5. 将以上信息按 organizations 数组格式写入项目根目录的 .yunxiao.json，并用 default: true 标记默认组织
 ```
 
-> **多组织场景**：不同项目仓库放不同的 `.yunxiao.json`，各自指向对应的组织和项目，互不干扰。
+> **多组织场景**：在 `organizations` 数组中添加新组织配置即可，无需多个配置文件。`default: true` 标记默认组织。
 
 ## 工具集 Toolsets
 
@@ -103,15 +108,7 @@ node dist/index.js --sse --toolsets=lite
 
 #### 多组织配置
 
-在 `.yunxiao.json` 中配置 `token` 字段，AI 读取后通过 `yunxiao_execute` 的 `token` 参数传入：
-
-```json
-// 项目A/.yunxiao.json
-{ "organizationId": "org-aaa", "token": "pat-aaa", ... }
-
-// 项目B/.yunxiao.json
-{ "organizationId": "org-bbb", "token": "pat-bbb", ... }
-```
+> **多组织场景**：在 `organizations` 数组中添加新组织配置即可，无需多个配置文件。`default: true` 标记默认组织。
 
 同一个 MCP Server 实例即可服务多个组织，无需重启。
 
@@ -149,6 +146,13 @@ node dist/index.js --sse --toolsets=lite
 | `update_work_item` | 更新工作项 | **`workItemId`**, **`updateWorkItemFields`**: `{subject, description, status, assignedTo, priority, sprint, labels, verifier, participants, customFieldValues}` |
 
 > **状态变更**：`updateWorkItemFields.status` 传状态 ID。状态 ID 因项目工作流而异，需先调 `get_work_item_workflow` 获取。
+>
+> **变更为「处理中」必填三要素**（需先与用户确认）：
+> 1. 计划开始时间（customFieldValues `"79"`: date）
+> 2. 计划完成时间（customFieldValues `"80"`: date）
+> 3. 预计工时（通过 `create_estimated_effort` 登记，**不可**通过 customFieldValues 直接修改）
+>
+> 正确顺序：先 `create_estimated_effort` → 再 `update_work_item`（带 status + customFieldValues 79/80）
 
 ### 工作项类型
 

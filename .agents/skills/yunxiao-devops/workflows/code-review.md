@@ -7,7 +7,7 @@ description: AI 辅助代码评审，对比分支差异并生成评审意见
 ## Step 1: 获取上下文
 
 ```
-读取 .yunxiao.json 获取 organizationId
+读取 .yunxiao.json，定位目标组织（default 或用户指定），获取 token、organizationId 及项目配置
 调用 list_repositories 定位目标仓库（或用户直接提供 repositoryId）
 ```
 

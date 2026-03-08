@@ -8,7 +8,7 @@ description: 分析需求描述，创建主需求并拆分子任务
 
 // turbo
 ```
-读取 .yunxiao.json 获取 organizationId、spaceId、workitemTypeId、defaultAssignee
+读取 .yunxiao.json，定位目标组织（default 或用户指定），获取 token、organizationId 及项目配置
 ```
 
 ## Step 2: 分析需求

@@ -8,7 +8,7 @@ description: 根据对话内容整理成任务和子任务并创建
 
 // turbo
 ```
-读取 .yunxiao.json 获取 organizationId、spaceId、workitemTypeId
+读取 .yunxiao.json，定位目标组织（default 或用户指定），获取 token、organizationId 及项目配置
 ```
 
 ## Step 2: 提取任务信息

@@ -7,7 +7,7 @@ description: 将需求按功能点或开发阶段自动拆解为子需求/子任
 ## Step 1: 获取父需求信息
 
 ```
-读取 .yunxiao.json 获取 organizationId、spaceId
+读取 .yunxiao.json，定位目标组织（default 或用户指定），获取 token、organizationId 及项目配置
 
 获取父需求详情：
   方式一：用户提供工作项编号（如 TASK-100）→ 调用 search_workitems(subject: "TASK-100")

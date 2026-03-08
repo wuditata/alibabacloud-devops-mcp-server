@@ -8,7 +8,7 @@ description: 列出我未完成的任务，按项目分组展示
 
 // turbo
 ```
-读取当前项目根目录的 .yunxiao.json 获取 organizationId 和 projects 列表
+读取 .yunxiao.json，定位目标组织（default 或用户指定），获取 token、organizationId 及项目配置
 若无配置文件，调用 get_user_organizations 获取 organizationId
 ```
 

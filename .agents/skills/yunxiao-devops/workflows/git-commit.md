@@ -9,7 +9,7 @@ description: Git 提交时携带云效任务编号
 ```
 确定当前开发关联的云效任务：
   方式一：用户直接提供任务编号（如 TASK-183）
-  方式二：读取 .yunxiao.json 后调用 search_workitems 搜索：
+  方式二：读取 .yunxiao.json，定位目标组织后调用 search_workitems 搜索：
     - assignedTo: "self"
     - status: "142838"（开发中）
     - category: "Task"

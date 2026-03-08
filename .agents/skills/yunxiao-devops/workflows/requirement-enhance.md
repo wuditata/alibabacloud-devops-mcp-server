@@ -7,7 +7,7 @@ description: 将简略需求优化为标准 User Story 并补充验收条件
 ## Step 1: 读取原始需求
 
 ```
-读取 .yunxiao.json 获取 organizationId
+读取 .yunxiao.json，定位目标组织（default 或用户指定），获取 token、organizationId 及项目配置
 
 获取目标需求：
   调用 get_work_item(workItemId) → 提取当前标题和描述
